@@ -18,6 +18,10 @@ def get_weather():
         response = requests.get(url)
         if response.status_code == 200:
             weather_info = response.text.strip()
+            # 替换英文城市名为中文
+            weather_info = weather_info.replace("Wuxi", "无锡")
+            # 添加"湿度:"标签
+            weather_info = weather_info.replace("%", " 湿度: %")
             return weather_info
     except Exception as e:
         print(f"获取天气信息失败: {str(e)}")
