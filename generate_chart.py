@@ -20,7 +20,7 @@ except:
 # 获取环境变量
 ACCESS_TOKEN = os.getenv('GITHUB_TOKEN')
 REPO_NAME = os.getenv('GITHUB_REPOSITORY')  # 格式: "owner/repo"
-ISSUE_NUMBER = 1  # 你的记录 Issue 编号
+ISSUE_NUMBER = 2  # 你的记录 Issue 编号
 
 # 确保Token存在
 if not ACCESS_TOKEN:
