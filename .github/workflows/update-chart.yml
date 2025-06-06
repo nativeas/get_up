@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write # 必须！用于提交 README.md 和图片
-
+      issues: read
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
