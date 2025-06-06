@@ -26,7 +26,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const issueNumber = 1; // 替换成你创建的记录 Issue 的实际编号！
+            const issueNumber = 2; // 替换成你创建的记录 Issue 的实际编号！
             const wakeUpTime = process.env.CURRENT_TIME;
             github.rest.issues.createComment({
               owner: context.repo.owner,
