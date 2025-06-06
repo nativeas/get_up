@@ -13,8 +13,8 @@ ISSUE_NUMBER = int(os.getenv('ISSUE_NUMBER', '2'))  # 默认使用 Issue #2
 def get_weather():
     """获取天气信息（使用 wttr.in API）"""
     try:
-        # 使用南京的天气信息
-        url = "https://wttr.in/Wuxi?format=%l:+%c+%t+%w+%h&lang=zh"
+        # 使用无锡的天气信息，设置温度为摄氏度
+        url = "https://wttr.in/Wuxi?format=%l:+%c+%t+%w+%h&lang=zh&u=c"
         response = requests.get(url)
         if response.status_code == 200:
             weather_info = response.text.strip()
