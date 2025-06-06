@@ -14,9 +14,12 @@ jobs:
       pull-requests: write
     runs-on: ubuntu-latest
     steps:
-      - name: Get current time (UTC)
+      - name: Get current time (Beijing)
         id: time
-        run: echo "CURRENT_TIME_UTC=$(date -u +'%Y-%m-%d %H:%M:%S')" >> $GITHUB_ENV
+        run: |
+          # 设置时区为上海
+          export TZ='Asia/Shanghai'
+          echo "CURRENT_TIME=$(date +'%Y-%m-%d %H:%M:%S')" >> $GITHUB_ENV
 
       - name: Add comment to Wake-up Log Issue
         uses: actions/github-script@v6
@@ -24,10 +27,10 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const issueNumber = 1; // 替换成你创建的记录 Issue 的实际编号！
-            const wakeUpTime = process.env.CURRENT_TIME_UTC;
+            const wakeUpTime = process.env.CURRENT_TIME;
             github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: issueNumber,
-              body: `⏰ 起床啦！时间 (UTC): ${wakeUpTime}`
+              body: `⏰ 起床啦！时间 (北京时间): ${wakeUpTime}`
             });
