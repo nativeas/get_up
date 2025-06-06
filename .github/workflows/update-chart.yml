@@ -2,21 +2,27 @@ name: Update Wake-up Chart and README
 
 on:
   schedule:
-    - cron: '0 12 * * *' # 每天 UTC 时间 12:00 (北京时间 20:00) 运行
-  workflow_dispatch: # 支持手动触发
+    - cron: '0 12 * * *' # 每天 UTC 时间 12:00 (北京时间 20:00)
+  workflow_dispatch:
 
 jobs:
   update-readme:
     runs-on: ubuntu-latest
     permissions:
-      contents: write # 必须！用于提交 README.md 和图片
+      contents: write
       issues: read
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          # 重要：fetch-depth 设置为 0 以获取完整历史记录，避免提交冲突
           fetch-depth: 0
+
+      - name: Install Chinese fonts
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y fonts-wqy-microhei
+          fc-list | grep "WenQuanYi Micro Hei"
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -25,30 +31,30 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install matplotlib PyGithub
+          pip install matplotlib requests numpy
 
       - name: Generate chart
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: python generate_chart.py # 使用之前提供的生成脚本
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python generate_chart.py
 
       - name: Update README with chart
-        # 使用强大的 sed 命令替换 README 中的特定标记
         run: |
-          # 定义要插入的 Markdown 图片代码
           IMAGE_MARKDOWN="![起床时间趋势图](wake_up_chart.png?raw=true \"每日起床时间记录\")"
-
-          # 在 README.md 中查找一个特殊标记 (例如：<!-- WAKE_CHART_PLACEHOLDER -->)
-          # 如果找到，则用图片代码替换整个标记行
-          # 如果没找到，则在文件末尾追加图片代码
           if grep -q "<!-- WAKE_CHART_PLACEHOLDER -->" README.md; then
             sed -i "s|<!-- WAKE_CHART_PLACEHOLDER -->|${IMAGE_MARKDOWN}|" README.md
           else
-            # 没找到标记，追加到文件末尾 (可选：也可以追加到特定位置)
             echo -e "\n${IMAGE_MARKDOWN}" >> README.md
           fi
 
       - name: Commit and push changes
         run: |
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git config
+          git config --local user.name "github-actions[bot]"
+          git add wake_up_chart.png README.md
+          if [ -n "$(git status --porcelain)" ]; then
+            git commit -m "Auto-update wake-up chart in README"
+            git push
+          else
+            echo "No changes to commit."
+          fi

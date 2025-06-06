@@ -1,28 +1,56 @@
 import os
 import re
-from datetime import datetime
+import requests
+import matplotlib as mpl
 import matplotlib.pyplot as plt
-from github import Github
-import requests  # 添加 requests 库
+from matplotlib.font_manager import FontProperties
+from datetime import datetime
+import numpy as np
+
+# 设置中文字体
+try:
+    # 尝试使用WenQuanYi Micro Hei字体
+    chinese_font = FontProperties(fname='/usr/share/fonts/truetype/wqy/wqy-microhei.ttc')
+    plt.rcParams['font.family'] = chinese_font.get_name()
+    plt.rcParams['axes.unicode_minus'] = False
+except:
+    # 如果字体不可用，使用默认字体
+    print("警告：中文字体不可用，使用默认字体")
 
 # 获取环境变量
 ACCESS_TOKEN = os.getenv('GITHUB_TOKEN')
 REPO_NAME = os.getenv('GITHUB_REPOSITORY')  # 格式: "owner/repo"
 ISSUE_NUMBER = 1  # 你的记录 Issue 编号
 
-# 使用更底层的 API 调用绕过 PyGithub 的限制
+# 确保Token存在
+if not ACCESS_TOKEN:
+    raise ValueError("GITHUB_TOKEN 环境变量未设置")
+
+# 使用GitHub API获取评论
 def get_issue_comments():
     url = f"https://api.github.com/repos/{REPO_NAME}/issues/{ISSUE_NUMBER}/comments"
     headers = {
         "Authorization": f"Bearer {ACCESS_TOKEN}",
-        "Accept": "application/vnd.github.v3+json"
+        "Accept": "application/vnd.github.v3+json",
+        "X-GitHub-Api-Version": "2022-11-28"
     }
     
-    response = requests.get(url, headers=headers)
-    if response.status_code != 200:
-        raise Exception(f"API error: {response.status_code} - {response.text}")
+    print(f"正在访问: {url}")
+    print(f"使用Token: {ACCESS_TOKEN[:5]}...{ACCESS_TOKEN[-5:]}")  # 打印部分Token用于调试
     
-    return response.json()
+    response = requests.get(url, headers=headers)
+    
+    # 打印响应状态和头部信息
+    print(f"响应状态: {response.status_code}")
+    print(f"响应头部: {response.headers}")
+    
+    if response.status_code == 200:
+        return response.json()
+    else:
+        # 打印详细错误信息
+        error_msg = f"API错误: {response.status_code} - {response.text}"
+        print(error_msg)
+        raise Exception(error_msg)
 
 # 主逻辑
 try:
@@ -67,6 +95,15 @@ try:
     plt.xlabel('日期')
     plt.ylabel('时间 (小时)')
     plt.ylim(0, 24)
+    
+    # 设置Y轴为时间格式
+    def hours_to_time(x):
+        hours = int(x)
+        minutes = int((x - hours) * 60)
+        return f"{hours:02d}:{minutes:02d}"
+    
+    plt.yticks(np.arange(0, 25, 2), [hours_to_time(t) for t in np.arange(0, 25, 2)])
+    
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
     
@@ -79,6 +116,6 @@ except Exception as e:
     # 创建错误图表
     plt.figure(figsize=(12, 6))
     plt.text(0.5, 0.5, '图表生成失败', ha='center', va='center', fontsize=20, color='red')
-    plt.text(0.5, 0.4, str(e), ha='center', va='center', fontsize=12)
+    plt.text(0.5, 0.4, str(e), ha='center', va='center', fontsize=10)
     plt.savefig('wake_up_chart.png')
     exit(1)
