@@ -1,0 +1,30 @@
+name: Log Wake-up Time (Comment)
+
+on:
+  # 定义如何触发这个 Action
+  workflow_dispatch: # 允许在 GitHub 网页上手动触发
+  issues: # 也可以通过创建特定标签的 Issue 来触发
+    types: [opened]
+    if: contains(github.event.issue.labels.*.name, 'wake-up')
+
+jobs:
+  log-time:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get current time (UTC)
+        id: time
+        run: echo "CURRENT_TIME_UTC=$(date -u +'%Y-%m-%d %H:%M:%S')" >> $GITHUB_ENV
+
+      - name: Add comment to Wake-up Log Issue
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const issueNumber = 1; // 替换成你创建的记录 Issue 的实际编号！
+            const wakeUpTime = process.env.CURRENT_TIME_UTC;
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNumber,
+              body: `⏰ 起床啦！时间 (UTC): ${wakeUpTime}`
+            });
