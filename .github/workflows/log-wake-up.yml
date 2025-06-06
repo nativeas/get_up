@@ -32,5 +32,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
           ISSUE_NUMBER: 2
-          WEATHER_API_KEY: ${{ secrets.WEATHER_API_KEY }}
         run: python wake_up_logger.py

@@ -11,23 +11,14 @@ REPO_NAME = os.getenv('GITHUB_REPOSITORY')
 ISSUE_NUMBER = int(os.getenv('ISSUE_NUMBER', '2'))  # 默认使用 Issue #2
 
 def get_weather():
-    """获取天气信息（示例：使用和风天气 API）"""
+    """获取天气信息（使用 wttr.in API）"""
     try:
-        # 这里需要替换成您的和风天气 API key
-        api_key = os.getenv('WEATHER_API_KEY')
-        if not api_key:
-            return ""
-            
-        # 这里使用南京的经纬度作为示例
-        lat = "32.0587"
-        lon = "118.7969"
-        url = f"https://api.qweather.com/v7/weather/now?location={lon},{lat}&key={api_key}"
-        
+        # 使用南京的天气信息
+        url = "https://wttr.in/Wuxi?format=%l:+%c+%t+%w+%h&lang=zh"
         response = requests.get(url)
         if response.status_code == 200:
-            data = response.json()
-            weather = data['now']
-            return f"温度: {weather['temp']}°C, {weather['text']}"
+            weather_info = response.text.strip()
+            return weather_info
     except Exception as e:
         print(f"获取天气信息失败: {str(e)}")
     return ""
