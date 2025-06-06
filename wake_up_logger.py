@@ -9,6 +9,32 @@ from github import Github
 GITHUB_TOKEN = os.getenv('GITHUB_TOKEN')
 REPO_NAME = os.getenv('GITHUB_REPOSITORY')
 ISSUE_NUMBER = int(os.getenv('ISSUE_NUMBER', '2'))  # 默认使用 Issue #2
+TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
+TELEGRAM_CHANNEL_ID = os.getenv('TELEGRAM_CHANNEL_ID')
+
+def send_telegram_message(message):
+    """发送消息到 Telegram 频道"""
+    if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHANNEL_ID:
+        print("未配置 Telegram 机器人令牌或频道 ID")
+        return False
+        
+    try:
+        url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+        data = {
+            "chat_id": TELEGRAM_CHANNEL_ID,
+            "text": message,
+            "parse_mode": "Markdown"
+        }
+        response = requests.post(url, data=data)
+        if response.status_code == 200:
+            print("Telegram 消息发送成功！")
+            return True
+        else:
+            print(f"Telegram 消息发送失败: {response.text}")
+            return False
+    except Exception as e:
+        print(f"发送 Telegram 消息时出错: {str(e)}")
+        return False
 
 def get_weather():
     """获取天气信息（使用 wttr.in API）"""
@@ -74,7 +100,10 @@ def main():
         
         # 在 Issue 中添加评论
         issue.create_comment(message)
-        print("打卡成功！")
+        print("GitHub 打卡成功！")
+        
+        # 发送到 Telegram
+        send_telegram_message(message)
         
     except Exception as e:
         print(f"打卡失败: {str(e)}")
