@@ -14,23 +14,23 @@ jobs:
       pull-requests: write
     runs-on: ubuntu-latest
     steps:
-      - name: Get current time (Beijing)
-        id: time
-        run: |
-          # 设置时区为上海
-          export TZ='Asia/Shanghai'
-          echo "CURRENT_TIME=$(date +'%Y-%m-%d %H:%M:%S')" >> $GITHUB_ENV
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: Add comment to Wake-up Log Issue
-        uses: actions/github-script@v6
+      - name: Set up Python
+        uses: actions/setup-python@v4
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const issueNumber = 2; // 替换成你创建的记录 Issue 的实际编号！
-            const wakeUpTime = process.env.CURRENT_TIME;
-            github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: issueNumber,
-              body: `⏰ 起床啦！时间 (北京时间): ${wakeUpTime}`
-            });
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests pytz PyGithub
+
+      - name: Run wake-up logger
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          ISSUE_NUMBER: 2
+          WEATHER_API_KEY: ${{ secrets.WEATHER_API_KEY }}
+        run: python wake_up_logger.py
