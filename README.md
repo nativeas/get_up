@@ -8,3 +8,5 @@
 > 图表每天自动更新，记录我的作息规律。
 
 ![起床时间趋势图](wake_up_chart.png?raw=true "每日起床时间记录")
+
+![起床时间趋势图](wake_up_chart.png?raw=true "每日起床时间记录")
