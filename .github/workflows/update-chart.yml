@@ -1,4 +1,4 @@
-name: Update Wake-up Chart and README
+name: Update Wake-up Chart
 
 on:
   schedule:
@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  update-readme:
+  update-chart:
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -38,19 +38,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python generate_chart.py
 
-      - name: Update README with chart
-        run: |
-          # 检查是否已经存在图片标记
-          if ! grep -q "![起床时间趋势图]" README.md; then
-            # 如果不存在图片标记，在文件末尾添加一次
-            echo -e "\n![起床时间趋势图](wake_up_chart.png?raw=true \"每日起床时间记录\")" >> README.md
-          fi
-
       - name: Commit and push changes
         run: |
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add wake_up_chart.png README.md
+          git add wake_up_chart.png
           if [ -n "$(git status --porcelain)" ]; then
             git commit -m "Auto-update wake-up chart"
             git push
