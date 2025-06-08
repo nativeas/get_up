@@ -11,3 +11,5 @@
 ![起床时间趋势图](wake_up_chart.png?raw=true "每日起床时间记录")
 
 ![起床时间趋势图](wake_up_chart.png?raw=true "每日起床时间记录")
+
+![起床时间趋势图](wake_up_chart.png?raw=true "每日起床时间记录")
