@@ -46,8 +46,11 @@ def get_weather():
             weather_info = response.text.strip()
             # 替换英文城市名为中文
             weather_info = weather_info.replace("Wuxi", "无锡")
-            # 添加"湿度:"标签
-            weather_info = weather_info.replace("%", " 湿度: %")
+            # 重新格式化湿度显示
+            parts = weather_info.split()
+            if len(parts) >= 4:
+                # 重新组合天气信息，将湿度放在最后
+                weather_info = f"{parts[0]}: {parts[1]} {parts[2]} {parts[3]} 湿度: {parts[4]} %"
             return weather_info
     except Exception as e:
         print(f"获取天气信息失败: {str(e)}")
