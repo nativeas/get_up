@@ -40,15 +40,9 @@ jobs:
 
       - name: Update README with chart
         run: |
-          # 检查 README.md 是否包含图片标记
-          if grep -q "<!-- WAKE_CHART_PLACEHOLDER -->" README.md; then
-            # 如果存在标记，替换标记为图片
-            sed -i "s|<!-- WAKE_CHART_PLACEHOLDER -->|![起床时间趋势图](wake_up_chart.png?raw=true \"每日起床时间记录\")|" README.md
-          elif grep -q "![起床时间趋势图]" README.md; then
-            # 如果已经存在图片，只更新图片文件
-            echo "图片已存在，仅更新图片文件"
-          else
-            # 如果既没有标记也没有图片，在文件末尾添加图片
+          # 检查是否已经存在图片标记
+          if ! grep -q "![起床时间趋势图]" README.md; then
+            # 如果不存在图片标记，在文件末尾添加一次
             echo -e "\n![起床时间趋势图](wake_up_chart.png?raw=true \"每日起床时间记录\")" >> README.md
           fi
 
